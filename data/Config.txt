@@ -1,0 +1,7 @@
+% Name=PortNumber %
+LCP=15151
+Delhaize=14000
+Colruyt=14001
+Carrefour=14002
+Spar=14003
+Aldi=14004

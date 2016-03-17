@@ -4,21 +4,19 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
-public class IOThread extends Thread {
+public class ShopThread extends Thread {
     private Socket socket = null;
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
 
     private String shopName;
-    private int shopID;
 
 
-    public IOThread(Socket socket, String shopName, int shopID) {
-        super("IOThread");
-        System.out.println("IOThread started");
+    public ShopThread(Socket socket, String shopName) {
+        super("ShopThread");
+        System.out.println("ShopThread started");
         this.socket = socket;
         this.shopName = shopName;
-        this.shopID = shopID;
     }
 
 

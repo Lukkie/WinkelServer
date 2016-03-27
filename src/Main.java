@@ -1,10 +1,14 @@
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import java.io.*;
 import java.net.ServerSocket;
+import java.security.Security;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
+        Security.addProvider(new BouncyCastleProvider());
 
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter name of shop: ");
@@ -25,6 +29,7 @@ public class Main {
                 if (name.equals("LCP")) LCPPortNumber = portOfS;
                 if (name.equals(shopName)) portNumber = portOfS;
             }
+            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,6 +41,16 @@ public class Main {
         if (portNumber == 0) {
             System.out.println("Error: Config.txt doesn't contain shop with name "+shopName);
             System.exit(-1);
+        }
+
+        try {
+            Tools.loadKeyInfo(shopName);
+            System.out.print("Private key: "); Tools.printByteArray(Tools.ECPrivateKey);
+            System.out.print("Public key: "); Tools.printByteArray(Tools.ECPublicKey);
+            System.out.print("Certificate: "); Tools.printByteArray(Tools.ECCertificate);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 

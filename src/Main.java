@@ -56,7 +56,7 @@ public class Main {
         }
 
 
-        new InputThread(shopName,14004).start();
+        new InputThread(shopName).start();
 
         ShopThread ioThread = null;
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {

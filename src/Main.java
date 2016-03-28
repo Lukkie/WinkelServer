@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 public class Main {
 
+    public static int amount; // niet zo mooi
+
     public static void main(String[] args) {
         Security.addProvider(new BouncyCastleProvider());
 
@@ -65,5 +67,7 @@ public class Main {
             System.err.println("Could not listen on port " + portNumber);
             System.exit(-1);
         }
+
+
     }
 }

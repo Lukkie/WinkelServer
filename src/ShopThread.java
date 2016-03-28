@@ -3,6 +3,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -59,6 +61,7 @@ public class ShopThread extends Thread {
             case "SetupSecureConnection": {
                 try {
                     setupSecureConnection(in, out);
+                    changeLP(in, out);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
@@ -147,22 +150,49 @@ public class ShopThread extends Thread {
         return null;
     }
 
-    private void changeLP(int amount) throws IOException {
-        // EERST SECURE CHANNEL OPZETTEN
+    private void changeLP(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        // EERST SECURE CHANNEL OPZETTEN (die setupSecureConnection())
 
-        // changeLP String verzenden
-        byte[] encryptedRequest = Tools.encryptMessage(Tools.applyPadding("changeLP".getBytes()), secretKey);
-        out.writeObject(encryptedRequest);
+        // Certificaat inlezen en checken.
+        byte[] encryptedCertificate = (byte[])in.readObject();
+        byte[] certificateBytes = Tools.decrypt(encryptedCertificate, secretKey);
+        byte[] certificateBytes413 = Arrays.copyOfRange(certificateBytes, 0, 413);
+        PseudoniemCertificate cert = null;
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(certificateBytes413);
+            ObjectInput oi = new ObjectInputStream(bis)) {
+            cert = (PseudoniemCertificate) oi.readObject();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        PublicKey pk = Tools.getPublicKey();
+        boolean verified = false;
+        try {
+            verified = cert.verifySignature(pk);
+            if (verified) System.out.println("Signature is verified");
+            else System.out.println("Signature is NOT OK");
 
-        // Shopname versturen
-        byte[] encryptedShopName = Tools.encryptMessage(Tools.applyPadding(shopName.getBytes()), secretKey);
-        out.writeObject(encryptedShopName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        // Amount versturen
-        String amountString = new Integer(amount).toString();
-        byte[] encryptedAmount = Tools.encryptMessage(Tools.applyPadding(amountString.getBytes()), secretKey);
-        out.writeObject(encryptedAmount);
+        if (verified) {
 
+            // Amount versturen
+            short amount = (short)Main.amount;
+            ByteBuffer buffer = ByteBuffer.allocate(2);
+            buffer.putShort(amount);
+            byte[] encryptedAmount = Tools.encryptMessage(Tools.applyPadding(buffer.array()), secretKey);
+            out.writeObject(encryptedAmount);
+
+            // Verifieren of correct
+            byte[] correctEncrypted = (byte[])in.readObject();
+            byte[] correct = Tools.decrypt(correctEncrypted, secretKey);
+            if (correct[0] == (byte)0x00) System.out.println("Transfer completed");
+            else System.out.println("Transfer failed.");
+
+
+
+        }
     }
 
 }

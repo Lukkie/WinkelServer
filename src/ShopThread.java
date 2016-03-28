@@ -196,7 +196,7 @@ public class ShopThread extends Thread {
             // Verifieren of correct
             byte[] correctEncrypted = (byte[])in.readObject();
             byte[] correct = Tools.decrypt(correctEncrypted, secretKey);
-            if (correct[0] == (byte)0x00) System.out.println("Transfer completed");
+            if (correct[0] == (byte)0x00) System.out.println("Transfer completed with success!");
             else System.out.println("Transfer failed.");
 
 

@@ -56,6 +56,8 @@ public class Main {
         }
 
 
+        new InputThread(shopName).start();
+
         ShopThread ioThread = null;
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
             System.out.println("Server \""+shopName+"\" listening on port "+portNumber);

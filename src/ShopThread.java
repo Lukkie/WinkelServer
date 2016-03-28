@@ -22,6 +22,7 @@ public class ShopThread extends Thread {
     private SecretKey secretKey = null;
     private String shopName;
 
+    private final boolean debug = false;
 
     public ShopThread(Socket socket, String shopName) {
         super("ShopThread");
@@ -152,6 +153,14 @@ public class ShopThread extends Thread {
 
     private void changeLP(ObjectInputStream in, ObjectOutputStream out) throws IOException, ClassNotFoundException {
         // EERST SECURE CHANNEL OPZETTEN (die setupSecureConnection())
+
+        // Voor testen:
+        if (debug) {
+            in.readObject();
+            out.writeObject(secretKey);
+        }
+
+
 
         // Certificaat inlezen en checken.
         byte[] encryptedCertificate = (byte[])in.readObject();

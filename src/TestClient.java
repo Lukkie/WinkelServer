@@ -1,15 +1,18 @@
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import javax.crypto.SecretKey;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.cert.CertificateException;
 
 
 public class TestClient {
 
 	public static void main(String[] args) {
+        Security.addProvider(new BouncyCastleProvider());
 		String hostName = "localhost";
 		int portNumber = 14004;
 
@@ -39,6 +42,32 @@ public class TestClient {
 
 
 
+            // Test certificaat genereren
+            // psuedoniem genereren
+            String pseudoString = Tools.generateRandomPseudoniem();
+            System.out.println("Generated pseudo: "+pseudoString+" (length: "+pseudoString.length()+")");
+            System.out.println("Pseudo byte array length: "+pseudoString.getBytes().length);
+
+            // certificaat genereren
+            try {
+                PseudoniemCertificate pseudoCertificate = generatePseudoCertificate(pseudoString);
+                byte[] encryptedCertificate = Tools.encryptMessage(Tools.applyPadding(pseudoCertificate.getBytes()), secretKey);
+                out.writeObject(encryptedCertificate);
+                System.out.println("Certificate size: "+pseudoCertificate.getBytes().length);
+                System.out.println("Encrypted certificate size: "+encryptedCertificate.length);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            byte[] shortArrayEncrypted = (byte[])in.readObject();
+            byte[] shortArray = Tools.decrypt(shortArrayEncrypted, secretKey);
+            System.out.println("shortArray[0] = "+shortArray[0]);
+            System.out.println("shortArray[1] = "+shortArray[1]);
+
+            byte[] confirmatie = new byte[1];
+            confirmatie[0] = (byte)0x00;
+            out.writeObject(Tools.encryptMessage(Tools.applyPadding(confirmatie), secretKey));
+
 
             System.out.println("\nEnding client");
 	        } catch (UnknownHostException e) {
@@ -53,6 +82,38 @@ public class TestClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+    }
+
+    private static PseudoniemCertificate generatePseudoCertificate(String pseudoString) throws
+            KeyStoreException, IOException, CertificateException,
+            NoSuchAlgorithmException, UnrecoverableKeyException, InvalidKeyException, NoSuchProviderException, SignatureException {
+        System.out.println("PseudoString size: "+pseudoString.length());
+
+        // Open keystore and retrieve private key
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        String fileNameStore1 = new File("certificates\\LCP.jks").getAbsolutePath();
+        char[] password = "LCP".toCharArray();
+        FileInputStream fis = new FileInputStream(fileNameStore1);
+        keyStore.load(fis, password);
+        fis.close();
+        PrivateKey privateKeyCA = (PrivateKey) keyStore.getKey("LoyaltyCardProvider", "LCP".toCharArray());
+        java.security.cert.Certificate certCA =  keyStore.getCertificate("LoyaltyCardProvider");
+        PublicKey publicKeyCA = certCA.getPublicKey();
+
+        // Generate certificate
+        PseudoniemCertificate cert = new PseudoniemCertificate(pseudoString.getBytes(), System.currentTimeMillis() + 1000L*60*60*24*100);
+        try {
+            cert.sign(privateKeyCA);
+            if (cert.verifySignature(publicKeyCA)) System.out.println("Signature verified");
+            else System.out.println("Signature invalid");
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        return cert;
+
 
 
     }

@@ -22,7 +22,7 @@ public class ShopThread extends Thread {
     private SecretKey secretKey = null;
     private String shopName;
 
-    private final boolean debug = false;
+    private final boolean debug = true;
 
     public ShopThread(Socket socket, String shopName) {
         super("ShopThread");

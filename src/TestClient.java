@@ -4,6 +4,7 @@ import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
@@ -15,6 +16,8 @@ public class TestClient {
         Security.addProvider(new BouncyCastleProvider());
 		String hostName = "localhost";
 		int portNumber = 14004;
+
+        System.out.println(Tools.ECCertificate.length);
 
 		try (
             Socket socket = new Socket(hostName, portNumber);
@@ -28,11 +31,12 @@ public class TestClient {
 
 
             byte[] input = (byte[])in.readObject();
-            System.out.println("Received bytes");
+            System.out.println("Received bytes for certificate");
             for (byte b: input) {
                 System.out.print("0x" + String.format("%02x", b) + " ");
             }
 
+            //throw new InterruptedException("test");
 
             out.writeObject(input); // Dummy: Zend zelfde public key terug
             Thread.sleep(500L);
@@ -40,6 +44,12 @@ public class TestClient {
             out.writeObject("getSessionKey");
             SecretKey secretKey = (SecretKey)in.readObject();
 
+
+            short amount = (short) 20;
+            ByteBuffer buffer = ByteBuffer.allocate(2);
+            buffer.putShort(amount);
+            byte[] amountBytes = new byte[2];
+            out.writeObject(Tools.encryptMessage(Tools.applyPadding(buffer.array()), secretKey));
 
 
             // Test certificaat genereren
@@ -49,15 +59,17 @@ public class TestClient {
             System.out.println("Pseudo byte array length: "+pseudoString.getBytes().length);
 
             // certificaat genereren
+            PseudoniemCertificate pseudoCertificate = null;
             try {
-                PseudoniemCertificate pseudoCertificate = generatePseudoCertificate(pseudoString);
-                byte[] encryptedCertificate = Tools.encryptMessage(Tools.applyPadding(pseudoCertificate.getBytes()), secretKey);
-                out.writeObject(encryptedCertificate);
-                System.out.println("Certificate size: "+pseudoCertificate.getBytes().length);
-                System.out.println("Encrypted certificate size: "+encryptedCertificate.length);
+                pseudoCertificate = generatePseudoCertificate(pseudoString);
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            byte[] encryptedCertificate = Tools.encryptMessage(Tools.applyPadding(pseudoCertificate.getBytes()), secretKey);
+            out.writeObject(encryptedCertificate);
+            System.out.println("Certificate size: "+pseudoCertificate.getBytes().length);
+            System.out.println("Encrypted certificate size: "+encryptedCertificate.length);
 
             byte[] shortArrayEncrypted = (byte[])in.readObject();
             byte[] shortArray = Tools.decrypt(shortArrayEncrypted, secretKey);

@@ -7,7 +7,8 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static int amount = 20; // niet zo mooi, 20 voor test
+    //public static short amount = 20; // niet zo mooi, 20 voor test
+    //public static short LP = 40; // 40 voor test
 
     public static void main(String[] args) {
         Security.addProvider(new BouncyCastleProvider());

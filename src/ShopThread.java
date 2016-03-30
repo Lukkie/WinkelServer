@@ -268,6 +268,16 @@ public class ShopThread extends Thread {
             byte[] sessionKey2 = generateSessionKey(publicKeyOtherParty.getEncoded());
             SecretKey secretKey2 = new SecretKeySpec(sessionKey2, 0, sessionKey2.length, "AES");
 
+            byte[] answerCertificate = Tools.decrypt((byte[])in.readObject(), secretKey2);
+            answerCertificate = Arrays.copyOfRange(answerCertificate, 0, certificateBytes.length);
+            if (!Arrays.equals(certificateBytes, answerCertificate)) {
+                System.out.print("Sent certificate (length: "+certificateBytes.length+"): "); Tools.printByteArray(certificateBytes);
+                System.out.print("Received certificate (length: "+answerCertificate.length+"): "); Tools.printByteArray(answerCertificate);
+
+                System.out.println("Middleman detected, assume certificate to be revoked");
+                return true;
+            }
+
             byte[] answer = Tools.decrypt((byte[]) in.readObject(), secretKey2);
             System.out.println("Answer = "+answer[0]);
             if (answer[0] == (byte)0x00) return true; // 0x00 als het revoked is

@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -70,7 +71,10 @@ public class Main extends Application{
         Scene rootScene = new Scene(root);
         primaryStage.setScene(rootScene);
         primaryStage.show();
-
+        primaryStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
 
 
         new RequestAccepter(shopName, portNumber, shopController).start();

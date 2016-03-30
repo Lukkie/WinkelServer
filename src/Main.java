@@ -1,21 +1,24 @@
+import javafx.scene.control.TextInputDialog;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.security.Security;
-import java.util.Scanner;
+import java.util.Optional;
 
-public class Main {
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class Main extends Application{
 
     //public static short amount = 20; // niet zo mooi, 20 voor test
     //public static short LP = 40; // 40 voor test
 
-    public static void main(String[] args) {
-        Security.addProvider(new BouncyCastleProvider());
-
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter name of shop: ");
-        String shopName = sc.nextLine();
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        String shopName = getShopName();
         int portNumber = 0;
         int LCPPortNumber = 0;
 
@@ -57,20 +60,43 @@ public class Main {
         }
 
 
-        new InputThread(shopName).start();
 
-        ShopThread ioThread = null;
-        try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
-            System.out.println("Server \""+shopName+"\" listening on port "+portNumber);
-            while (true) {
-                ioThread = new ShopThread(serverSocket.accept(), shopName);
-                ioThread.start();
-            }
-        } catch (IOException e) {
-            System.err.println("Could not listen on port " + portNumber);
-            System.exit(-1);
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("Shop.fxml"));
+        Parent root = loader.load();
+        ShopController shopController = loader.getController();
+        shopController.setShopName(shopName);
+        primaryStage.setTitle(shopName);
+        Scene rootScene = new Scene(root);
+        primaryStage.setScene(rootScene);
+        primaryStage.show();
+
+
+
+        new RequestAccepter(shopName, portNumber, shopController).start();
+    }
+
+    public static void main(String[] args) {
+        Security.addProvider(new BouncyCastleProvider());
+
+
+
+        launch(args);
+
+
+    }
+
+    private String getShopName() {
+        TextInputDialog dialog = new TextInputDialog("Aldi");
+        dialog.setTitle("Shop chooser");
+        dialog.setHeaderText("What is the name of the shop?");
+        dialog.setContentText("Shop name:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            return result.get();
         }
-
-
+        return null;
     }
 }

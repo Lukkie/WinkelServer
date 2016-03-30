@@ -23,13 +23,16 @@ public class ShopThread extends Thread {
     private SecretKey secretKey = null;
     private String shopName;
 
+    private ShopController shopController;
+
     private final boolean debug = true;
 
-    public ShopThread(Socket socket, String shopName) {
+    public ShopThread(Socket socket, String shopName, ShopController shopController) {
         super("ShopThread");
         System.out.println("ShopThread started");
         this.socket = socket;
         this.shopName = shopName;
+        this.shopController = shopController;
     }
 
 
@@ -201,6 +204,7 @@ public class ShopThread extends Thread {
             //Open GUI-venster met prompt voor amount, check of juist, en bij cancel: zend null
 
             try {
+                shopController.updateInfo(valueHolder);
                 synchronized (valueHolder) {
                     //new ChangeLPWindow(this, );
                     try {

@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
@@ -48,10 +49,12 @@ public class ShopController {
         button.setText("Load");
         amountField.setText("");
         LPField.setText("");
-
+        LPField.setTooltip(new Tooltip("Current amount on card. Press \"Load\" first. (This value cannot be changed)"));
         amountField.textProperty().addListener((observableValue, s, s2) -> {
             amountChanged();
         });
+
+        amountField.setStyle("-fx-control-inner-background: grey");
 
         button.setOnAction(event -> loadInfo());
 

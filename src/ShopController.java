@@ -115,6 +115,7 @@ public class ShopController {
 
     public void updateInfo(ValueHolder valueHolder) {
         this.valueHolder = valueHolder;
+        LPField.setText(""+valueHolder.getLP());
         loaded = true;
         button.setText("Change LP");
         button.setOnAction(event -> changeLP() );

@@ -54,7 +54,7 @@ public class ShopController {
             amountChanged();
         });
 
-        amountField.setStyle("-fx-control-inner-background: grey");
+        amountField.setStyle("-fx-control-inner-background: white");
 
         button.setOnAction(event -> loadInfo());
 

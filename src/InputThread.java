@@ -42,13 +42,13 @@ public class InputThread extends Thread {
                 }
             }
 
-            Main.amount = amount;
-            changeLP();
+            //Main.amount = amount;
+            /*changeLP();*/
         }
 
     }
 
-    private void changeLP() {
+    /*private void changeLP() {
         String hostName = "localhost";
         int portNumber = 13000;
 
@@ -71,5 +71,5 @@ public class InputThread extends Thread {
                     hostName);
             System.exit(1);
         }
-    }
+    }*/
 }

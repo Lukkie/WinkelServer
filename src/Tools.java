@@ -16,6 +16,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -232,6 +234,14 @@ public class Tools {
             output[i] = new Byte("0");
         }
         return output;
+    }
+
+    public static short byteArrayToShort(byte[] input) {
+        ByteBuffer bb = ByteBuffer.allocate(2);
+        bb.order(ByteOrder.BIG_ENDIAN);
+        bb.put(input[0]);
+        bb.put(input[1]);
+        return bb.getShort(0);
     }
 
 }

@@ -1,3 +1,5 @@
+import javafx.application.Platform;
+
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -204,7 +206,13 @@ public class ShopThread extends Thread {
             //Open GUI-venster met prompt voor amount, check of juist, en bij cancel: zend null
 
             try {
-                shopController.updateInfo(valueHolder);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        shopController.updateInfo(valueHolder);
+                    }
+                });
+
                 synchronized (valueHolder) {
                     //new ChangeLPWindow(this, );
                     try {

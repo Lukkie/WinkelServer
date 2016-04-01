@@ -43,7 +43,7 @@ public class InputThread extends Thread {
             }
 
             //Main.amount = amount;
-            /*changeLP();*/
+            //changeLP();
         }
 
     }

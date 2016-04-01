@@ -14,9 +14,11 @@ import java.util.Scanner;
 public class InputThread extends Thread {
 
     private String shopName;
+    private int portNumber;
 
-    public InputThread(String shopName) {
+    public InputThread(String shopName, int portNumber) {
         this.shopName = shopName;
+        this.portNumber = portNumber;
     }
 
     @Override

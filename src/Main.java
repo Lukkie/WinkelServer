@@ -1,5 +1,6 @@
 import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
@@ -19,6 +20,8 @@ public class Main extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        primaryStage.getIcons().add(new Image("file:icon.png"));
+
         String shopName = getShopName();
         int portNumber = 0;
         int LCPPortNumber = 0;

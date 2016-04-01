@@ -237,11 +237,16 @@ public class Tools {
     }
 
     public static short byteArrayToShort(byte[] input) {
+        /*
         ByteBuffer bb = ByteBuffer.allocate(2);
         bb.order(ByteOrder.BIG_ENDIAN);
         bb.put(input[0]);
         bb.put(input[1]);
         return bb.getShort(0);
+        */
+        int offset = 0;
+
+        return (short) (((input[offset] << 8)) | ((input[offset + 1] & 0xff)));
     }
 
 }

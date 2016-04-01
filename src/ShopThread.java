@@ -27,7 +27,7 @@ public class ShopThread extends Thread {
 
     private ShopController shopController;
 
-    private final boolean debug = true;
+    private final boolean debug = false;
 
     public ShopThread(Socket socket, String shopName, ShopController shopController) {
         super("ShopThread");
@@ -174,13 +174,20 @@ public class ShopThread extends Thread {
 
 
         // LP Ophalen
+        System.out.println("Reading encrypted LP");
         byte[] encryptedLP = (byte[])in.readObject();
+        System.out.print("\t Received encryptedLP: "); Tools.printByteArray(encryptedLP);
         byte[] decryptedLP = Tools.decrypt(encryptedLP, secretKey);
+        System.out.print("\t after decryption: "); Tools.printByteArray(decryptedLP);
+        System.out.println("Which is "+Tools.byteArrayToShort(Arrays.copyOfRange(decryptedLP, 0, 2)));
         valueHolder.setLP(Tools.byteArrayToShort(Arrays.copyOfRange(decryptedLP, 0, 2)));
 
 
         // Certificaat inlezen en checken.
+        System.out.println("Reading encrypted certificate");
         byte[] encryptedCertificate = (byte[])in.readObject();
+        System.out.println("Done Reading encrypted certificate");
+        System.out.println("Decrypting encrypted certificate");
         byte[] certificateBytes = Tools.decrypt(encryptedCertificate, secretKey);
         byte[] certificateBytes413 = Arrays.copyOfRange(certificateBytes, 0, 413);
         PseudoniemCertificate cert = null;
@@ -192,6 +199,7 @@ public class ShopThread extends Thread {
         }
         PublicKey pk = Tools.getPublicKey();
         boolean verified = false;
+        System.out.println("checking verification certificate");
         try {
             verified = cert.verifySignature(pk);
             if (verified) System.out.println("Signature is verified");
@@ -200,8 +208,6 @@ public class ShopThread extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
         if (verified) {
             //Open GUI-venster met prompt voor amount, check of juist, en bij cancel: zend null
 
@@ -222,6 +228,7 @@ public class ShopThread extends Thread {
                     ByteBuffer buffer = ByteBuffer.allocate(2);
                     buffer.putShort(amount);
                     byte[] encryptedAmount = Tools.encryptMessage(Tools.applyPadding(buffer.array()), secretKey);
+                    System.out.println("Sending encrypted amount: "+Tools.byteArrayToShort(buffer.array()));
                     out.writeObject(encryptedAmount);
 
                     // Verifieren of correct
@@ -234,7 +241,10 @@ public class ShopThread extends Thread {
                 e.printStackTrace();
             }
         }
-        else out.writeObject(null);
+        else{
+            System.err.println("Not verified, sending null");
+            out.writeObject(null);
+        }
     }
 
     /**

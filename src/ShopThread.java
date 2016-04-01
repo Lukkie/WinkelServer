@@ -27,7 +27,7 @@ public class ShopThread extends Thread {
 
     private ShopController shopController;
 
-    private final boolean debug = true;
+    private final boolean debug = false;
 
     public ShopThread(Socket socket, String shopName, ShopController shopController) {
         super("ShopThread");
@@ -206,12 +206,7 @@ public class ShopThread extends Thread {
             //Open GUI-venster met prompt voor amount, check of juist, en bij cancel: zend null
 
             try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        shopController.updateInfo(valueHolder);
-                    }
-                });
+                Platform.runLater(() -> shopController.updateInfo(valueHolder));
 
                 synchronized (valueHolder) {
                     //new ChangeLPWindow(this, );

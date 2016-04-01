@@ -27,7 +27,7 @@ public class ShopThread extends Thread {
 
     private ShopController shopController;
 
-    private final boolean debug = false;
+    private final boolean debug = true;
 
     public ShopThread(Socket socket, String shopName, ShopController shopController) {
         super("ShopThread");
@@ -218,6 +218,7 @@ public class ShopThread extends Thread {
 
                     // Amount versturen
                     short amount = (short)valueHolder.getAmount();
+                    System.out.println("Received amount to add: "+ amount);
                     ByteBuffer buffer = ByteBuffer.allocate(2);
                     buffer.putShort(amount);
                     byte[] encryptedAmount = Tools.encryptMessage(Tools.applyPadding(buffer.array()), secretKey);

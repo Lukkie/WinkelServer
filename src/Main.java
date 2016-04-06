@@ -1,10 +1,13 @@
 import javafx.application.Platform;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -94,10 +97,32 @@ public class Main extends Application{
     }
 
     private String getShopName() {
-        TextInputDialog dialog = new TextInputDialog("Aldi");
-        dialog.setTitle("Shop chooser");
-        dialog.setHeaderText("What is the name of the shop?");
+        List<String> choices = new ArrayList<>();
+
+        File configFile = new File("data\\config.txt");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(configFile));
+            String s = null;
+            while ((s = br.readLine()) != null) {
+                if (s.charAt(0) == '%') continue;
+                String name = s.split("=")[0];
+
+                if (!name.equals("LCP")) {
+                    choices.add(name);
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+        dialog.setTitle("Shop selection");
+        dialog.setHeaderText("What is the name of your shop?");
         dialog.setContentText("Shop name:");
+        Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("file:icon.png"));
 
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();

@@ -1,11 +1,4 @@
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -15,9 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ResourceBundle;
 
 public class ShopController {
 
@@ -33,7 +24,9 @@ public class ShopController {
     @FXML
     private AnchorPane root;
     @FXML
-    private Button button;
+    private Button loadButton;
+    @FXML
+    private Button changeButton;
     @FXML
     private TextField LPField; // LP op kaart
     @FXML
@@ -46,7 +39,8 @@ public class ShopController {
     @FXML
     public void initialize() {
         loaded = false;
-        button.setText("Load");
+        changeButton.setDisable(true);
+        loadButton.setDisable(false);
         amountField.setText("");
         LPField.setText("");
         LPField.setTooltip(new Tooltip("Current amount on card. Press \"Load\" first. (This value cannot be changed)"));
@@ -56,7 +50,8 @@ public class ShopController {
 
         amountField.setStyle("-fx-control-inner-background: white");
 
-        button.setOnAction(event -> loadInfo());
+        loadButton.setOnAction(event -> loadInfo());
+        changeButton.setOnAction(event -> changeLP() );
 
     }
 
@@ -120,8 +115,8 @@ public class ShopController {
         this.valueHolder = valueHolder;
         LPField.setText(""+valueHolder.getLP());
         loaded = true;
-        button.setText("Change LP");
-        button.setOnAction(event -> changeLP() );
+        loadButton.setDisable(true);
+        changeButton.setDisable(false);
     }
 
     private void changeLP() {

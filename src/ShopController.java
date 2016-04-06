@@ -149,4 +149,24 @@ public class ShopController {
             }
         }
     }
+
+    public void openNotVerifiedDialog() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Verification of card signature failed");
+        alert.setHeaderText(null);
+
+        alert.setContentText("Signature of card is invalid. Unable to load information.");
+
+        alert.showAndWait();
+    }
+
+    public void openCertificateRevokedDialog() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Verification of card failed");
+        alert.setHeaderText(null);
+
+        alert.setContentText("Certificate of card is revoked. Unable to load information.");
+
+        alert.showAndWait();
+    }
 }

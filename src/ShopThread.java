@@ -110,6 +110,7 @@ public class ShopThread extends Thread {
         if (isCertificateRevoked(certificateOtherParty)) {
             System.out.println("Certificate is revoked"); // verbinding afbreken
             // TODO: Pop-up genereren zodat shop weet dat kaart z'n certificate revoked is.
+            Platform.runLater(() -> shopController.openCertificateRevokedDialog());
         }
         else {
             System.out.println("Certificate is valid. Continuing..");
@@ -203,7 +204,10 @@ public class ShopThread extends Thread {
         try {
             verified = cert.verifySignature(pk);
             if (verified) System.out.println("Signature is verified");
-            else System.out.println("Signature is NOT OK");
+            else {
+                System.out.println("Signature is NOT OK");
+                Platform.runLater(() -> shopController.openNotVerifiedDialog());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

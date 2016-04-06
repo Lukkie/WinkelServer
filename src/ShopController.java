@@ -140,6 +140,7 @@ public class ShopController {
     private void changeLP() {
         boolean parsed = parseVariables();
         if (parsed) {
+            changeButton.setDisable(true);
             if (valueHolder.setLPToAdd((short) amount)) {
                 synchronized(valueHolder) {
                     valueHolder.notify();

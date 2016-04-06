@@ -1,4 +1,5 @@
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -53,6 +54,23 @@ public class ShopController {
         loadButton.setOnAction(event -> loadInfo());
         changeButton.setOnAction(event -> changeLP() );
 
+    }
+
+    public void returnToBeginState(boolean transferSucces) {
+        loaded = false;
+        changeButton.setDisable(true);
+        loadButton.setDisable(false);
+        amountField.setText("");
+        LPField.setText("");
+        amountField.setStyle("-fx-control-inner-background: white");
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Transaction status");
+        alert.setHeaderText(null);
+        if (transferSucces) alert.setContentText("Transaction completed.");
+        else alert.setContentText("Transaction failed!");
+
+        alert.showAndWait();
     }
 
 
@@ -126,7 +144,7 @@ public class ShopController {
                 synchronized(valueHolder) {
                     valueHolder.notify();
                 }
-                initialize();
+                //initialize();
             }
         }
     }
